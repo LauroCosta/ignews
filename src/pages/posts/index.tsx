@@ -1,11 +1,12 @@
 import { GetStaticProps } from "next";
 import Head from "next/head";
 import Prismic from "@prismicio/client";
-import {format, parseISO} from "date-fns";
+import { format, parseISO } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
 import { RichText } from "prismic-dom";
 import { getPrismicClient } from "../../services/prismic";
 import styles from "./styles.module.scss";
+import Link from "next/link";
 
 type Post = {
   slug: string;
@@ -28,11 +29,13 @@ export default function Posts({ posts }: PostProps) {
       <main className={styles.container}>
         <div className={styles.posts}>
           {posts.map((post) => (
-            <a key={post.slug} href="#">
-              <time>{post.updatedAt}</time>
-              <strong>{post.title}</strong>
-              <p>{post.excerpt}</p>
-            </a>
+            <Link href={`/posts/${post.slug}`}>
+              <a key={post.slug}>
+                <time>{post.updatedAt}</time>
+                <strong>{post.title}</strong>
+                <p>{post.excerpt}</p>
+              </a>
+            </Link>
           ))}
         </div>
       </main>
@@ -52,20 +55,21 @@ export const getStaticProps: GetStaticProps = async () => {
   );
 
   const posts = response.results.map((post) => {
-
-
     return {
       slug: post.uid,
       title: RichText.asText(post.data.title),
       excerpt:
         post.data.content.find((content) => content.type === "paragraph")
           ?.text ?? "",
-      updatedAt: format(parseISO(post.last_publication_date), "dd 'de' MMMM 'de' yyyy", {
-        locale: ptBR
-      })
+      updatedAt: format(
+        parseISO(post.last_publication_date),
+        "dd 'de' MMMM 'de' yyyy",
+        {
+          locale: ptBR,
+        }
+      ),
     };
   });
-
 
   return {
     props: {
