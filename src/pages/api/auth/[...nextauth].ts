@@ -1,6 +1,5 @@
 import { query as q } from "faunadb";
 import NextAuth from "next-auth";
-import { useSession } from "next-auth/client";
 import Providers from "next-auth/providers";
 
 import { fauna } from "../../../services/fauna";
@@ -38,8 +37,9 @@ export default NextAuth({
         );
 
         return {
-          ...session,
+
           activeSubscription: userActiveSubscription,
+          ...session,
         };
       } catch {
         return {
@@ -48,6 +48,7 @@ export default NextAuth({
         };
       }
     },
+   
     async signIn(user, account, profile) {
       const { email } = user;
 
